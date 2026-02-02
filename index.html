@@ -2,23 +2,40 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Music Searcher</title>
+  <title>Music Explorer</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-  <div class="container">
-    <h1>🎵 Music Searcher</h1>
-    <p class="subtitle">Search real music using iTunes API</p>
+<div class="container">
+  <h1>🎵 Music Explorer</h1>
+  <p class="subtitle">Search real music using iTunes API</p>
 
-    <div class="search-box">
-      <input type="text" id="searchInput" placeholder="Search song, artist, album..." />
-      <button onclick="searchMusic()">Search</button>
-    </div>
-
-    <div id="results" class="results"></div>
+  <div class="search-box">
+    <input id="searchInput" placeholder="Search song, artist, album..."
+           onkeypress="if(event.key==='Enter')searchMusic()">
+    <button onclick="searchMusic()">Search</button>
   </div>
 
-  <script src="script.js"></script>
+  <div class="controls">
+    <select id="genreFilter" onchange="applyFilter()">
+      <option value="">All Genres</option>
+    </select>
+    <button onclick="toggleTheme()">🌙 Toggle Theme</button>
+  </div>
+
+  <div class="loader" id="loader"></div>
+
+  <div id="results" class="results"></div>
+
+  <h2>❤️ Favorites</h2>
+  <div id="favorites" class="results"></div>
+
+  <h2>🎧 Playlist</h2>
+  <div id="playlist" class="results"></div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
