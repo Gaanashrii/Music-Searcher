@@ -1,9 +1,11 @@
-// DOM elements
+/* ================= DOM ELEMENTS ================= */
+
 const resultsDiv = document.getElementById("results");
 const loader = document.getElementById("loader");
 const genreFilter = document.getElementById("genreFilter");
 
-// Global state
+/* ================= GLOBAL STATE ================= */
+
 let allSongs = [];
 let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
 let playlist = JSON.parse(localStorage.getItem("playlist")) || [];
@@ -29,7 +31,7 @@ async function searchMusic() {
     allSongs = data.results || [];
     populateGenres(allSongs);
     displayResults(allSongs);
-  } catch (error) {
+  } catch (err) {
     resultsDiv.innerHTML = `<p class="empty">Error fetching music 😢</p>`;
   } finally {
     loader.style.display = "none";
@@ -53,7 +55,7 @@ function displayResults(songs) {
     card.className = "card";
 
     card.innerHTML = `
-      <img src="${song.artworkUrl100.replace("100x100", "300x300")}" alt="Album Art">
+      <img src="${song.artworkUrl100.replace("100x100", "300x300")}">
       <h3>${song.trackName || "Unknown Track"}</h3>
       <p><strong>Artist:</strong> ${song.artistName}</p>
       <p><strong>Genre:</strong> ${song.primaryGenreName || "N/A"}</p>
@@ -63,7 +65,6 @@ function displayResults(songs) {
       <button class="play-btn">➕ Add to Playlist</button>
     `;
 
-    // Button events (SAFE way)
     card.querySelector(".fav-btn").addEventListener("click", () => {
       addToFavorites(song.trackId);
     });
@@ -89,17 +90,35 @@ function addToFavorites(trackId) {
   }
 }
 
+function removeFromFavorites(trackId) {
+  favorites = favorites.filter(song => song.trackId !== trackId);
+  localStorage.setItem("favorites", JSON.stringify(favorites));
+  renderFavorites();
+}
+
 function renderFavorites() {
   const favDiv = document.getElementById("favorites");
   favDiv.innerHTML = "";
 
+  if (!favorites.length) {
+    favDiv.innerHTML = `<p class="empty">No favorites yet ❤️</p>`;
+    return;
+  }
+
   favorites.forEach(song => {
     const card = document.createElement("div");
     card.className = "card";
+
     card.innerHTML = `
       <h3>${song.trackName}</h3>
       <p>${song.artistName}</p>
+      <button class="remove-btn">❌ Remove</button>
     `;
+
+    card.querySelector(".remove-btn").addEventListener("click", () => {
+      removeFromFavorites(song.trackId);
+    });
+
     favDiv.appendChild(card);
   });
 }
@@ -117,17 +136,35 @@ function addToPlaylist(trackId) {
   }
 }
 
+function removeFromPlaylist(trackId) {
+  playlist = playlist.filter(song => song.trackId !== trackId);
+  localStorage.setItem("playlist", JSON.stringify(playlist));
+  renderPlaylist();
+}
+
 function renderPlaylist() {
   const playDiv = document.getElementById("playlist");
   playDiv.innerHTML = "";
 
+  if (!playlist.length) {
+    playDiv.innerHTML = `<p class="empty">Playlist is empty 🎧</p>`;
+    return;
+  }
+
   playlist.forEach(song => {
     const card = document.createElement("div");
     card.className = "card";
+
     card.innerHTML = `
       <h3>${song.trackName}</h3>
       ${song.previewUrl ? `<audio controls src="${song.previewUrl}"></audio>` : ""}
+      <button class="remove-btn">❌ Remove</button>
     `;
+
+    card.querySelector(".remove-btn").addEventListener("click", () => {
+      removeFromPlaylist(song.trackId);
+    });
+
     playDiv.appendChild(card);
   });
 }
@@ -164,7 +201,7 @@ function toggleTheme() {
   document.body.classList.toggle("dark");
 }
 
-/* ================= INIT ================= */
+/* ================= INITIAL LOAD ================= */
 
 renderFavorites();
 renderPlaylist();
